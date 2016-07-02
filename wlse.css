@@ -1,0 +1,28 @@
+.control-label {
+    font-family: Helvetica, serif;
+    min-width: 27px;
+    min-height: 27px;
+    padding: 4px;
+    border-radius: 45px;
+    border: 1px solid #000;
+    background-color: #4A4A4A;
+    color: #fff;
+    font-size: 10px;
+    line-height: 9px;
+    overflow:auto;
+    text-align: center;
+    position: absolute;
+    text-transform: lowercase;
+    z-index: 999;
+}
+.tooltip-input {
+    max-width: 200px;
+}
+.result-less {
+    min-width: 400px;
+    min-height: 440px;
+}
+
+#wlseGetLess {
+    display: none;
+}
