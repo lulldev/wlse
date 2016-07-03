@@ -18,6 +18,7 @@
         var schemaJSON = [];
 
         var config = {
+            storageName:  'wlse',
             schemaPrefix: 'schema-',
             sortLessPattern: [
                 "bg1_color", "bg1_color_end", "bg1_border", "bg1_opacity", "bg1_radius",
@@ -86,17 +87,34 @@
              */
             init: function () {
                 $('body').prepend('<div class="wlse">' +
-                    '<a href="#" id="wlseStart">Start edit!</a>  <a href="#" id="wlseGetLess">Get LESS!</a>' +
+                    '<a href="#" id="wlseStart">Start edit!</a> |  ' +
+                    '<a href="#" id="wlseClearStorage">Clear Local Storage!</a> | ' +
+                    '<a href="#" id="wlseGetLess">Get LESS!</a>  ' +
                     '</div>'
                 );
 
                 // add events
                 $('#wlseStart').on('click', function() {
+                    // get LESS style from Local Storage
+                    var lessFromLS = functions.getLessFromLS()
+                    if (Object.keys(lessFromLS).length !== 0) {
+                        alert('WLES: Local Storage contain LESS code! Apply it..');
+                        // apply styles from Local storage
+                        functions.applyLessToPage(lessFromLS);
+                    }
                     functions.generateControlLabels();
                 });
 
                 $('#wlseGetLess').on('click', function() {
                     functions.generateGetLessWindow();
+                });
+
+                $('#wlseClearStorage').on('click', function() {
+                    // clear LESS style from Local Storage
+                    functions.clearLessFromLS();
+                    alert('WLES: Local storage is clear!');
+                    // apply styles
+                    location.reload();
                 });
 
                 return false;
@@ -450,6 +468,9 @@
                                                 schemaJSON[key].schemaClasses[targetSchemaElement] = targetSchemaVal;
                                             }
                                         }
+
+                                        // save to Local Storage
+                                        functions.saveLessToLS(schemaLESS);
                                     });
                                 });
                             }
@@ -469,19 +490,28 @@
                     }
                 });
             },
+
             generateGetLessWindow: function () {
                 var schemaValue, resultLess = "";
-
                 schemaLESS = functions.schemaLessSort(schemaLESS);
+                console.log('sorted', schemaLESS);
+                // fix colors rgb to hex
+                schemaLESS = functions.hexLessVal(schemaLESS);
+                console.log('hexed', schemaLESS);
+
                 for (var schemaProperty in schemaLESS) {
                     schemaValue = schemaLESS[schemaProperty];
-                    if (functions.isPropertyColorable(schemaProperty)) {
-                        schemaValue = helpers.rgb2hex(schemaValue);
-                    }
+                    // no unusable prop
                     if (!functions.isSchemaPropertyUnusable(schemaProperty, schemaValue) && schemaValue !== '') {
                         resultLess += "@" + schemaProperty + ":      " + schemaValue + ";\n";
                     }
                 }
+
+
+
+                functions.applyLessToPage(schemaLESS);
+
+                functions.saveLessToLS(schemaLESS);
 
                 var tooltipHtml = '<textarea class="result-less">' + resultLess + '</textarea>';
 
@@ -495,6 +525,52 @@
                         $('#wlseGetLess').tooltipster('destroy');
                     }
                 }).tooltipster('open');
+
+            },
+
+            hexLessVal: function(schemaLESS) {
+                if (Object.keys(schemaLESS).length !== 0) {
+                    var fixedLess = {};
+                    for (var propName in schemaLESS) {
+                        if (functions.isPropertyColorable(propName)) {
+                            fixedLess[propName] =  helpers.rgb2hex(schemaLESS[propName]);
+                        }
+                    }
+                    return fixedLess;
+                }
+                return false;
+            },
+
+            applyLessToPage: function(schemaLESS) {
+                if (Object.keys(schemaLESS).length !== 0) {
+                    var jQtargetSchemaElement;
+                    for (var propName in schemaLESS) {
+                        jQtargetSchemaElement = "." + config.schemaPrefix + propName;
+                        var parseProperty = functions.parsePropByClassName(propName);
+                        $(jQtargetSchemaElement).css(parseProperty, schemaLESS[propName]);
+                    }
+                }
+                return false;
+            },
+
+            saveLessToLS: function(schemaLESS) {
+                if (Object.keys(schemaLESS).length !== 0) {
+                    localStorage.setItem(config.storageName, JSON.stringify(schemaLESS));
+                    return true;
+                }
+                return false;
+            },
+
+            getLessFromLS: function() {
+                var getLess = localStorage.getItem(config.storageName);
+                if (getLess !== null) {
+                    return JSON.parse(getLess);
+                }
+                return false;
+            },
+
+            clearLessFromLS: function() {
+                localStorage.removeItem(config.storageName);
             }
         };
 
@@ -519,9 +595,7 @@
                         ("0" + parseInt(rgb[3], 10).toString(16)).slice(-2) : '';
                     }
                 }
-                else {
-                    return rgbInput;
-                }
+                return rgbInput;
             }
         };
 
