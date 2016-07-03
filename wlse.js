@@ -18,7 +18,7 @@
         var schemaJSON = [];
 
         var config = {
-            storageName:  'wlse',
+            storageName: 'wlse',
             schemaPrefix: 'schema-',
             sortLessPattern: [
                 "bg1_color", "bg1_color_end", "bg1_border", "bg1_opacity", "bg1_radius",
@@ -94,7 +94,7 @@
                 );
 
                 // add events
-                $('#wlseStart').on('click', function() {
+                $('#wlseStart').on('click', function () {
                     // get LESS style from Local Storage
                     var lessFromLS = functions.getLessFromLS()
                     if (Object.keys(lessFromLS).length !== 0) {
@@ -105,11 +105,11 @@
                     functions.generateControlLabels();
                 });
 
-                $('#wlseGetLess').on('click', function() {
+                $('#wlseGetLess').on('click', function () {
                     functions.generateGetLessWindow();
                 });
 
-                $('#wlseClearStorage').on('click', function() {
+                $('#wlseClearStorage').on('click', function () {
                     // clear LESS style from Local Storage
                     functions.clearLessFromLS();
                     alert('WLES: Local storage is clear!');
@@ -263,7 +263,7 @@
              *
              */
             generateControlLabels: function () {
-                
+
                 $('#wlseGetLess').show();
 
                 // search all elements with schema-
@@ -491,13 +491,15 @@
                 });
             },
 
+            /**
+             * Open tooltip with textarea. Generating ready LESS code
+             **
+             */
             generateGetLessWindow: function () {
                 var schemaValue, resultLess = "";
                 schemaLESS = functions.schemaLessSort(schemaLESS);
-                console.log('sorted', schemaLESS);
                 // fix colors rgb to hex
                 schemaLESS = functions.hexLessVal(schemaLESS);
-                console.log('hexed', schemaLESS);
 
                 for (var schemaProperty in schemaLESS) {
                     schemaValue = schemaLESS[schemaProperty];
@@ -507,10 +509,7 @@
                     }
                 }
 
-
-
-                functions.applyLessToPage(schemaLESS);
-
+                // save LESS to Local Storage
                 functions.saveLessToLS(schemaLESS);
 
                 var tooltipHtml = '<textarea class="result-less">' + resultLess + '</textarea>';
@@ -520,7 +519,7 @@
                     contentAsHTML: true,
                     interactive: true,
                     trigger: 'click',
-                    functionAfter: function(instance, helper) {
+                    functionAfter: function (instance, helper) {
                         // $(instance._$origin[0]).tooltipster('destroy');
                         $('#wlseGetLess').tooltipster('destroy');
                     }
@@ -528,12 +527,20 @@
 
             },
 
-            hexLessVal: function(schemaLESS) {
+            /**
+             * Converting all colorful value from RGB to HEX
+             **
+             * @param {Object} - schemaLESS
+             *
+             * @return {Object / bool} - converted schemaLess object, false - if input
+             * schemaLess is empty
+             */
+            hexLessVal: function (schemaLESS) {
                 if (Object.keys(schemaLESS).length !== 0) {
                     var fixedLess = {};
                     for (var propName in schemaLESS) {
                         if (functions.isPropertyColorable(propName)) {
-                            fixedLess[propName] =  helpers.rgb2hex(schemaLESS[propName]);
+                            fixedLess[propName] = helpers.rgb2hex(schemaLESS[propName]);
                         }
                     }
                     return fixedLess;
@@ -541,7 +548,15 @@
                 return false;
             },
 
-            applyLessToPage: function(schemaLESS) {
+            /**
+             * Apply schemaLESS CSS values to page
+             **
+             * @param {Object} - schemaLESS
+             *
+             * @return {bool} - true - css is apply, false - schemaLESS is empty
+             * schemaLess is empty
+             */
+            applyLessToPage: function (schemaLESS) {
                 if (Object.keys(schemaLESS).length !== 0) {
                     var jQtargetSchemaElement;
                     for (var propName in schemaLESS) {
@@ -549,11 +564,20 @@
                         var parseProperty = functions.parsePropByClassName(propName);
                         $(jQtargetSchemaElement).css(parseProperty, schemaLESS[propName]);
                     }
+                    return true;
                 }
                 return false;
             },
 
-            saveLessToLS: function(schemaLESS) {
+            /**
+             * Save schemaLESS object to Local Storage with special name
+             * (default: wlse) [see config]
+             **
+             * @param {Object} - schemaLESS
+             *
+             * @return {bool} - true - schemaLESS save in LS, false - schemaLESS is empty
+             */
+            saveLessToLS: function (schemaLESS) {
                 if (Object.keys(schemaLESS).length !== 0) {
                     localStorage.setItem(config.storageName, JSON.stringify(schemaLESS));
                     return true;
@@ -561,15 +585,25 @@
                 return false;
             },
 
-            getLessFromLS: function() {
+            /**
+             * Get schemaLESS object from Local Storage
+             * (default LS name: wlse) [see config]
+             **
+             *
+             * @return {Object/bool} -  schemaLESS object, false - LS value is not exist
+             */
+            getLessFromLS: function () {
                 var getLess = localStorage.getItem(config.storageName);
                 if (getLess !== null) {
                     return JSON.parse(getLess);
                 }
                 return false;
             },
-
-            clearLessFromLS: function() {
+            /**
+             * Clear LS. Delet special param from Local Storage (default name param: wlse)
+             **
+             */
+            clearLessFromLS: function () {
                 localStorage.removeItem(config.storageName);
             }
         };
