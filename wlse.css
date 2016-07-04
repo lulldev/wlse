@@ -26,3 +26,27 @@
 #wlseGetLess {
     display: none;
 }
+
+.wlse {
+    position: fixed;
+    z-index: 999;
+    background-color: #1b1b1b;
+    opacity: 0.7;
+}
+.wlse strong {
+    color: red;
+}
+.wlse a {
+    border-right: 1px solid #fff;
+    padding-right: 5px;
+    color: #fff;
+    text-decoration: none;
+}
+.wlse a:hover {
+    text-decoration: underline;
+}
+
+.search-form_filters {
+    position: relative;
+}
+

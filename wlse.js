@@ -19,64 +19,7 @@
 
         var config = {
             storageName: 'wlse',
-            schemaPrefix: 'schema-',
-            sortLessPattern: [
-                "bg1_color", "bg1_color_end", "bg1_border", "bg1_opacity", "bg1_radius",
-                "bg2_color", "bg2_color_end", "bg2_border", "bg2_opacity", "bg2_radius",
-                "bg3_color", "bg3_color_end", "bg3_border", "bg3_opacity", "bg3_radius",
-                "bg4_color", "bg4_color_end", "bg4_border", "bg4_opacity", "bg4_radius",
-                "bg5_color", "bg5_color_end", "bg5_border", "bg5_opacity", "bg5_radius",
-                "bg6_color", "bg6_color_end", "bg6_border", "bg6_opacity", "bg6_radius",
-                "bg7_color", "bg7_color_end", "bg7_border", "bg7_opacity", "bg7_radius",
-                "bg8_color", "bg8_color_end", "bg8_border", "bg8_opacity", "bg8_radius",
-                "bg9_color", "bg9_color_end", "bg9_border", "bg9_opacity", "bg9_radius",
-                "bg10_color", "bg10_color_end", "bg10_border", "bg10_opacity", "bg10_radius",
-                "bg11_color", "bg11_color_end", "bg11_border", "bg11_opacity", "bg11_radius",
-                "bg12_color", "bg12_color_end", "bg12_border", "bg12_opacity", "bg12_radius",
-                "bg13_color", "bg13_color_end", "bg13_border", "bg13_opacity", "bg13_radius",
-                "bg14_color", "bg14_color_end", "bg14_border", "bg14_opacity", "bg14_radius",
-                "bg15_color", "bg15_color_end", "bg15_border", "bg15_opacity", "bg15_radius",
-                "bg16_color", "bg16_color_end", "bg16_border", "bg16_opacity", "bg16_radius",
-                "bg17_color", "bg17_color_end", "bg17_border", "bg17_opacity", "bg17_radius",
-                "bg18_color", "bg18_color_end", "bg18_border", "bg18_opacity", "bg18_radius",
-                "bg19_color", "bg19_color_end", "bg19_border", "bg19_opacity", "bg19_radius",
-                "bg20_color", "bg20_color_end", "bg20_border", "bg20_opacity", "bg20_radius",
-                "bg21_color", "bg21_color_end", "bg21_border", "bg21_opacity", "bg21_radius",
-                "bg22_color", "bg22_color_end", "bg22_border", "bg22_opacity", "bg22_radius",
-                "bg23_color", "bg23_color_end", "bg23_border", "bg23_opacity", "bg23_radius",
-                "bg24_color", "bg24_color_end", "bg24_border", "bg24_opacity", "bg24_radius",
-                "bg25_color", "bg25_color_end", "bg25_border", "bg25_opacity", "bg25_radius",
-                "bg26_color", "bg26_color_end", "bg26_border", "bg26_opacity", "bg26_radius",
-                "bg27_color", "bg27_color_end", "bg27_border", "bg27_opacity", "bg27_radius",
-                "font1_color", "font1_size",
-                "font2_color", "font2_size",
-                "font3_color", "font3_size",
-                "font4_color", "font4_size",
-                "font5_color", "font5_size",
-                "font6_color", "font6_size",
-                "font7_color", "font7_size",
-                "font8_color", "font8_size",
-                "font9_color", "font9_size",
-                "font10_color", "font10_size",
-                "font11_color", "font11_size",
-                "font12_color", "font12_size",
-                "font13_color", "font13_size",
-                "font14_color", "font14_size",
-                "font15_color", "font15_size",
-                "font16_color", "font16_size",
-                "font17_color", "font17_size",
-                "font18_color", "font18_size",
-                "font19_color", "font19_size",
-                "font20_color", "font20_size",
-                "font21_color", "font21_size",
-                "font22_color", "font22_size",
-                "font23_color", "font23_size",
-                "font24_color", "font24_size",
-                "font25_color", "font25_size",
-                "font26_color", "font26_size",
-                "font27_color", "font27_size",
-                "font28_color", "font28_size"
-            ]
+            schemaPrefix: 'schema-'
         };
 
         var methods = {
@@ -87,8 +30,9 @@
              */
             init: function () {
                 $('body').prepend('<div class="wlse">' +
-                    '<a href="#" id="wlseStart">Start edit!</a> |  ' +
-                    '<a href="#" id="wlseClearStorage">Clear Local Storage!</a> | ' +
+                    '<strong>WLSE</strong> ' +
+                    '<a href="#" id="wlseStart">Start edit!</a>  ' +
+                    '<a href="#" id="wlseClearStorage">Clear Local Storage!</a> ' +
                     '<a href="#" id="wlseGetLess">Get LESS!</a>  ' +
                     '</div>'
                 );
@@ -152,7 +96,7 @@
                 if (className.indexOf('bg') !== -1) {
                     if (className.indexOf('color') !== -1) {
                         if (className.indexOf('end') !== -1) {
-                            return "background";
+                            return "background-image";
                         }
                         return "background-color";
                     }
@@ -206,14 +150,12 @@
              * @private
              */
             schemaLessSort: function (schemaLessObject) {
-                var result = {};
-                config.sortLessPattern.forEach(function (prop, index) {
-                    prop = prop.replace('_', '-');
-                    if (schemaLessObject.hasOwnProperty(prop)) {
-                        result[prop] = schemaLessObject[prop];
-                    }
+                var schemaLessArr = Object.keys(schemaLessObject), sorted = {};
+                schemaLessArr.sort(function (a, b) {
+                    return (a[0] > b[0]) || (Number(a.match(/\d+/)) > Number(b.match(/\d+/))) ? 1 : -1;
                 });
-                return result;
+                for (var prop in schemaLessArr) sorted[schemaLessArr[prop]] = schemaLessObject[schemaLessArr[prop]];
+                return sorted;
             },
 
             /**
@@ -229,13 +171,13 @@
              */
             isSchemaPropertyUnusable: function (schemaProperty, schemaValue) {
                 if (schemaValue !== '' && schemaValue !== undefined) {
-                    if (schemaProperty.indexOf('opacity') !== -1 && schemaValue === '1') {
+                    if (schemaProperty.indexOf('opacity') !== -1 && schemaValue == '1') {
                         return true;
                     }
-                    else if (schemaProperty.indexOf('radius') !== -1 && schemaValue === '0px') {
+                    else if (schemaProperty.indexOf('radius') !== -1 && schemaValue == '0px') {
                         return true;
                     }
-                    else if (schemaProperty.indexOf('end') !== -1 && schemaValue.indexOf('linear-gradient') === -1) {
+                    else if (schemaProperty.indexOf('end') !== -1 && schemaValue == 'none') {
                         return true;
                     }
                 }
@@ -279,7 +221,10 @@
                     // sister count
                     var classListCount = classList.length;
                     // temp var
+
                     var tempSchemaLess = {};
+
+                    var lessFromLS = functions.getLessFromLS();
 
                     $.each(classList, function (index, shemaClassName) {
                         // jquery selector
@@ -295,11 +240,6 @@
 
                             // if first schemaClassName - generate label name (parent)
                             if (foundCounter == 0) {
-                                // generate parent
-                                var parentClassName = parsedClassName.substr(
-                                    0,
-                                    parsedClassName.indexOf('-')
-                                );
                                 // add to json schema
                                 schemaJSON[elem_counter] = {
                                     nodeSelectors: selectorShemaClass, // selector name
@@ -308,13 +248,18 @@
                             }
 
                             // add to less schema
-                            var shemaProp = selectorShemaClass.css(functions.parsePropByClassName(parsedClassName));
+                            var propName = functions.parsePropByClassName(parsedClassName);
+                            var propVal = selectorShemaClass.css(propName);
 
-                            if (!(parsedClassName in schemaLESS)) {
-                                schemaLESS[parsedClassName] = shemaProp;
+                            if (functions.isPropertyColorable(propName)) {
+                                propVal = helpers.rgb2hex(propVal);
                             }
 
-                            tempSchemaLess[parsedClassName] = shemaProp;
+                            if (!(parsedClassName in schemaLESS)) {
+                                schemaLESS[parsedClassName] = propVal;
+                            }
+
+                            tempSchemaLess[parsedClassName] = propVal;
 
                             // add labels
                             labelName = functions.parseLabelByClassName(parsedClassName);
@@ -335,43 +280,7 @@
                     tempSchemaLess = {};
                 });
 
-                var selector, labels;
-
-                function instanceSchema() {
-                    schemaJSON.forEach(function (i, c) {
-                        var k = 0;
-                        while (k <= schemaJSON[c].nodeSelectors.length) {
-
-                            selector = $(schemaJSON[c].nodeSelectors[k])[0];
-
-                            var newControl = $('<span class="control-label">' + schemaJSON[c].labels.join('<br>') + '</span>')
-                                .css('left', parseInt($(selector).css('width')) - 30)
-                                .css('top', 0);
-
-                            //if ($(selector).children('.control-label').length === 0) {
-
-                            // generate inputs by labels array
-                            var tooltipHtml = '', val;
-                            for (var key in schemaJSON[c].schemaClasses) {
-                                val = schemaJSON[c].schemaClasses[key];
-
-                                // rgb to hex (if color)
-                                if (functions.isPropertyColorable(key)) {
-                                    val = helpers.rgb2hex(val);
-                                }
-
-                                tooltipHtml += "<label>" + key + "</label><br>" +
-                                    "<input type='text' data-target='" + key + "' value='" + val + "' class='tooltip-input'/><br>";
-                            }
-
-                            tooltipHtml += '<button class="tooltip-set-btn">Set</button>';
-
-                            // set form to tooltip
-                            newControl.attr("title", tooltipHtml);
-                            k++;
-                        }
-                    });
-                }
+                var selector;
 
                 schemaJSON.forEach(function (i, c) {
                     var k = 0;
@@ -395,9 +304,15 @@
                                 schemaPropertyVal = helpers.rgb2hex(schemaPropertyVal);
                             }
 
-                            // if opacity, radius, liniar
+
+                            // if opacity, radius, liniar - test empty values
                             if (functions.isSchemaPropertyUnusable(schemaProperty, schemaPropertyVal)) {
                                 schemaPropertyVal = '';
+                            }
+
+                            // gradient
+                            if (schemaProperty.indexOf('end') !== -1 && schemaPropertyVal !== '') {
+                                schemaPropertyVal = schemaLESS[schemaProperty];
                             }
 
                             tooltipHtml += "<label>" + schemaProperty + "</label><br>" +
@@ -430,12 +345,17 @@
                                         if (functions.isPropertyColorable(schemaProperty)) {
                                             schemaPropertyVal = helpers.rgb2hex(schemaPropertyVal);
                                         }
+                                        // if gradient
+                                        if (schemaProperty.indexOf('end') && schemaPropertyVal != 'none') {
+                                            schemaPropertyVal = schemaLESS[schemaProperty];
+                                        }
+                                        // console.log(schemaProperty, schemaPropertyVal);
                                         $(labelHtmlElement).val(schemaPropertyVal);
                                     }
                                 });
+
                                 controlLabel.tooltipster('content', controlLabelContent);
 
-                                // todo localstorage save on
                                 $('#' + instance.__namespace).find('.tooltip-set-btn').on('click', function () {
                                     var tooltipContent = $(this).parent(),
                                         tooltipInputs = tooltipContent.find('input[data-target]'),
@@ -450,15 +370,18 @@
                                         var parseProperty = functions.parsePropByClassName(targetSchemaElement);
 
                                         // special for background linear
-                                        if (parseProperty === "background") {
+                                        if (parseProperty === "background-image") {
                                             // bg in previes input
-                                            var bgColor = $(tooltipInputs[i - 1]).val(),
-                                                bgColorEnd = targetSchemaVal;
-                                            targetSchemaVal = "linear-gradient(141deg, " + bgColor + ", 0%, " + bgColorEnd + " 100%)";
+                                            var bgColor = $(tooltipInputs[i - 1]),
+                                                bgColorVal = $(tooltipInputs[i - 1]).val(),
+                                                bgColorEndVal = targetSchemaVal;
+                                            $(jQtargetSchemaElement).css(parseProperty, "linear-gradient(to bottom, " + bgColorVal + " 0%, " + bgColorEndVal + " 100%)");
+                                            // bg end
+                                            targetSchemaVal = bgColorEndVal;
+                                        } else {
+                                            // other all elements
+                                            $(jQtargetSchemaElement).css(parseProperty, targetSchemaVal);
                                         }
-
-                                        $(jQtargetSchemaElement).css(parseProperty, targetSchemaVal);
-
                                         // save to schemaLESS
                                         schemaLESS[targetSchemaElement] = targetSchemaVal;
 
@@ -470,6 +393,7 @@
                                         }
 
                                         // save to Local Storage
+                                        schemaLESS = functions.hexLessVal(schemaLESS);
                                         functions.saveLessToLS(schemaLESS);
                                     });
                                 });
@@ -562,7 +486,22 @@
                     for (var propName in schemaLESS) {
                         jQtargetSchemaElement = "." + config.schemaPrefix + propName;
                         var parseProperty = functions.parsePropByClassName(propName);
-                        $(jQtargetSchemaElement).css(parseProperty, schemaLESS[propName]);
+
+                        // special for gradient
+                        if (parseProperty == 'background-image') {
+                            if (schemaLESS[propName] !== 'none') {
+                                // give prop bg
+                                var propNameBg = propName.substr(0, propName.indexOf('-')) + '-color',
+                                    propNameBgEnd = propName;
+                                // gradient it
+                                $(jQtargetSchemaElement).css(parseProperty,
+                                    "linear-gradient(to bottom, " + schemaLESS[propNameBg] + " 0%, " + schemaLESS[propNameBgEnd] + " 100%)");
+                            }
+                        } else {
+                            $(jQtargetSchemaElement).css(parseProperty, schemaLESS[propName]);
+
+                        }
+
                     }
                     return true;
                 }
@@ -615,12 +554,15 @@
             /**
              * Convert RGB to HEX
              *
-             * @param {string} rgbInput - 'rgba(0, 0, 0, 0)'
+             * @param {string} rgbInput - 'rgba(255, 0, 0)'
              * @return {string} HEX value
              * @type {{rgb2hex: helpers.rgb2hex}}
              */
-            rgb2hex: function (rgbInput) {
-                if (rgbInput !== undefined && rgbInput !== '') {
+            rgb2hex: function (rgbInput) { // todo
+                if (rgbInput != undefined && rgbInput !== '') {
+                    if (rgbInput === 'rgba(0, 0, 0, 0)') {
+                        return '';
+                    }
                     var rgb = rgbInput.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
                     if (rgb !== null) {
                         return (rgb && rgb.length === 4) ? "#" +
