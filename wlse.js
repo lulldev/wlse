@@ -151,10 +151,16 @@
              */
             schemaLessSort: function (schemaLessObject) {
                 var schemaLessArr = Object.keys(schemaLessObject), sorted = {};
+
                 schemaLessArr.sort(function (a, b) {
-                    return (a[0] > b[0]) || (Number(a.match(/\d+/)) > Number(b.match(/\d+/))) ? 1 : -1;
+                    var first = a.substr(0, a.indexOf('-')),
+                        second = b.substr(0, b.indexOf('-'));
+                    return (first > second || first.length > second.length) ? 1 : -1;;
                 });
-                for (var prop in schemaLessArr) sorted[schemaLessArr[prop]] = schemaLessObject[schemaLessArr[prop]];
+
+                for (var prop in schemaLessArr) {
+                    sorted[schemaLessArr[prop]] = schemaLessObject[schemaLessArr[prop]];
+                }
                 return sorted;
             },
 
@@ -346,10 +352,13 @@
                                             schemaPropertyVal = helpers.rgb2hex(schemaPropertyVal);
                                         }
                                         // if gradient
-                                        if (schemaProperty.indexOf('end') && schemaPropertyVal != 'none') {
-                                            schemaPropertyVal = schemaLESS[schemaProperty];
+                                        if (schemaProperty.indexOf('end') !== -1) {
+                                            if (schemaPropertyVal !== 'none' && schemaPropertyVal != 0) {
+                                                schemaPropertyVal = schemaLESS[schemaProperty];
+                                            } else {
+                                                schemaPropertyVal = '';
+                                            }
                                         }
-                                        // console.log(schemaProperty, schemaPropertyVal);
                                         $(labelHtmlElement).val(schemaPropertyVal);
                                     }
                                 });
@@ -368,9 +377,8 @@
                                         // set style
                                         jQtargetSchemaElement = "." + config.schemaPrefix + targetSchemaElement;
                                         var parseProperty = functions.parsePropByClassName(targetSchemaElement);
-
                                         // special for background linear
-                                        if (parseProperty === "background-image") {
+                                        if (parseProperty === "background-image" && targetSchemaVal != '') {
                                             // bg in previes input
                                             var bgColor = $(tooltipInputs[i - 1]),
                                                 bgColorVal = $(tooltipInputs[i - 1]).val(),
@@ -379,6 +387,7 @@
                                             // bg end
                                             targetSchemaVal = bgColorEndVal;
                                         } else {
+                                            if (parseProperty === "background-image") $(jQtargetSchemaElement).css('background-image', 'none');
                                             // other all elements
                                             $(jQtargetSchemaElement).css(parseProperty, targetSchemaVal);
                                         }
@@ -421,6 +430,7 @@
              */
             generateGetLessWindow: function () {
                 var schemaValue, resultLess = "";
+                // sorting
                 schemaLESS = functions.schemaLessSort(schemaLESS);
                 // fix colors rgb to hex
                 schemaLESS = functions.hexLessVal(schemaLESS);
@@ -465,6 +475,8 @@
                     for (var propName in schemaLESS) {
                         if (functions.isPropertyColorable(propName)) {
                             fixedLess[propName] = helpers.rgb2hex(schemaLESS[propName]);
+                        } else {
+                            fixedLess[propName] = schemaLESS[propName];
                         }
                     }
                     return fixedLess;
